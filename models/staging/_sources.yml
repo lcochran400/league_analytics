@@ -1,0 +1,8 @@
+sources:
+  - name: league_raw
+    database: league_data
+    schema: main
+    tables:
+      - name: matches
+      - name: match_participants
+      - name: match_objectives
