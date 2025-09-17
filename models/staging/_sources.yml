@@ -4,5 +4,5 @@ sources:
     schema: main
     tables:
       - name: matches
-      - name: match_participants
-      - name: match_objectives
+      - name: participants
+      - name: objectives
