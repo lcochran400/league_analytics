@@ -15,8 +15,6 @@ renamed as (
         json_extract(participant_json, '$.teamId')::int as team_id,
 
         -- team context
-        json_extract(participant_json, '$.placement')::int as placement,
-        json_extract(participant_json, '$.subteamPlacement')::int as subteam_placement,
         replace(json_extract(participant_json, '$.teamPosition')::string, '"', '') as team_position,
 
         case
@@ -57,13 +55,17 @@ renamed as (
         replace(json_extract(participant_json, '$.lane')::string, '"', '') as lane,
         json_extract(participant_json, '$.participantId')::int as participant_id,
         json_extract(participant_json, '$.neutralMinionsKilled')::int as neutral_minions_killed,
+        json_extract(participant_json, '$.challenges.laneMinionsFirst10Minutes') as cs_first_10_minutes,
+        json_extract(participant_json, '$.challenges.maxCsAdvantageOnLaneOpponent') as max_cs_advantage_vs_opponent,
         json_extract(participant_json, '$.totalAllyJungleMinionsKilled')::int as total_ally_jungle_minions_killed,
         json_extract(participant_json, '$.totalEnemyJungleMinionsKilled')::int as total_enemy_jungle_minions_killed,
+        json_extract(participant_json, '$.challenges.earlyLaningPhaseGoldExpAdvantage') as lane_gold_advantage,
 
         -- economy
         json_extract(participant_json, '$.consumablesPurchased')::int as consumables_purchased,
         json_extract(participant_json, '$.goldEarned')::int as gold_earned,
         json_extract(participant_json, '$.goldSpent')::int as gold_spent,
+        json_extract(participant_json, '$.challenges.goldPerMinute') as gold_per_minute,
         json_extract(participant_json, '$.item0')::int as item0,
         json_extract(participant_json, '$.item1')::int as item1,
         json_extract(participant_json, '$.item2')::int as item2,
@@ -71,7 +73,7 @@ renamed as (
         json_extract(participant_json, '$.item4')::int as item4,
         json_extract(participant_json, '$.item5')::int as item5,
         json_extract(participant_json, '$.item6')::int as item6,
-        json_extract(participant_json, '$.itemsPurchased')::int as items_purchased,  
+        json_extract(participant_json, '$.itemsPurchased')::int as items_purchased,
 
         -- pings
         json_extract(participant_json, '$.allInPings')::int as all_in_pings,
@@ -90,6 +92,8 @@ renamed as (
         json_extract(participant_json, '$.detectorWardsPlaced')::int as detector_wards_placed,
         json_extract(participant_json, '$.sightWardsBoughtInGame')::int as sight_wards_bought_in_game,
         json_extract(participant_json, '$.visionWardsBoughtInGame')::int as vision_wards_bought_in_game,
+        json_extract(participant_json, '$.challenges.controlWardsPlaced') as control_wards_placed,
+        json_extract(participant_json, '$.challenges.visionScorePerMinute') as vision_score_per_minute,
         json_extract(participant_json, '$.wardsKilled')::int as wards_killed,
         json_extract(participant_json, '$.wardsPlaced')::int as wards_placed,
         json_extract(participant_json, '$.visionScore')::int as vision_score,
@@ -98,6 +102,8 @@ renamed as (
         json_extract(participant_json, '$.kills')::int as kills,
         json_extract(participant_json, '$.deaths')::int as deaths,
         json_extract(participant_json, '$.assists')::int as assists,
+        json_extract(participant_json, '$.challenges.kda') as kda,
+        json_extract(participant_json, '$.challenges.killParticipation') as kill_participation,
         json_extract(participant_json, '$.killingSprees')::int as killing_sprees,
         json_extract(participant_json, '$.doubleKills')::int as double_kills,
         json_extract(participant_json, '$.tripleKills')::int as triple_kills,
@@ -144,12 +150,7 @@ renamed as (
         json_extract(participant_json, '$.totalHeal')::int as total_heal,
         json_extract(participant_json, '$.totalHealsOnTeammates')::int as total_heals_on_teammates,
         json_extract(participant_json, '$.largestCriticalStrike')::int as largest_critical_strike,
-
-        -- game results
-        json_extract(participant_json, '$.gameEndedInEarlySurrender')::boolean as game_ended_in_early_surrender,
-        json_extract(participant_json, '$.gameEndedInSurrender')::boolean as game_ended_in_surrender,
-        json_extract(participant_json, '$.teamEarlySurrendered')::boolean as team_early_surrendered,
-        json_extract(participant_json, '$.win')::boolean as win,
+        json_extract(participant_json, '$.challenges.highestChampionDamage') as highest_champion_damage,
 
         -- timers
         json_extract(participant_json, '$.totalMinionsKilled')::int as total_minions_killed,
@@ -159,10 +160,11 @@ renamed as (
         json_extract(participant_json, '$.timeCCingOthers')::int / 60 as time_ccing_others,
         json_extract(participant_json, '$.timePlayed')::int / 60 as time_played,
 
-        -- deeper arrays
-        json_extract(participant_json, '$.challenges')::string as challenges,
-        json_extract(participant_json, '$.missions')::string as missions,
-        json_extract(participant_json, '$.perks') as perks
+        -- game results
+        json_extract(participant_json, '$.gameEndedInEarlySurrender')::boolean as game_ended_in_early_surrender,
+        json_extract(participant_json, '$.gameEndedInSurrender')::boolean as game_ended_in_surrender,
+        json_extract(participant_json, '$.teamEarlySurrendered')::boolean as team_early_surrendered,
+        json_extract(participant_json, '$.win')::boolean as win
 
     from source
 
