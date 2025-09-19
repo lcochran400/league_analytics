@@ -1,0 +1,11 @@
+models:
+  - name: stg_participants
+    columns:
+      - name: individual_position
+        description: '{{ doc("position") }}'
+      - name: position_on_team
+        description: '{{ doc("position") }}'
+      - name: role
+        description: '{{ doc("role") }}'
+      - name: lane
+        description: '{{ doc("lane") }}'
