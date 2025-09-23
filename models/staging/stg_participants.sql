@@ -15,13 +15,6 @@ renamed as (
         puuid,
         json_extract(participant_json, '$.teamId')::int as team_id,
 
-        -- team context
-        case
-            when team_id = 100
-            then 'blue'
-            else 'red'
-        end as team_side,
-
         -- champion & account
         {{ extract_json_string('participant_json', '$.riotIdGameName') }} as riot_id_game_name,        
         {{ extract_json_string('participant_json', '$.riotIdTagline') }} as riot_id_tagline,        
