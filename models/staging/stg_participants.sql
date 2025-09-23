@@ -23,10 +23,10 @@ renamed as (
         end as team_side,
 
         -- champion & account
-        replace(json_extract(participant_json, '$.riotIdGameName')::string, '"', '') as riot_id_game_name,
-        replace(json_extract(participant_json, '$.riotIdTagline')::string, '"', '') as riot_id_tagline,
+        {{ extract_json_string('participant_json', '$.riotIdGameName') }} as riot_id_game_name,        
+        {{ extract_json_string('participant_json', '$.riotIdTagline') }} as riot_id_tagline,        
         json_extract(participant_json, '$.summonerLevel')::int as summoner_level,
-        replace(json_extract(participant_json, '$.championName')::string, '"', '') as champion_name,
+        {{ extract_json_string('participant_json', '$.championName') }} as champion_name, 
         json_extract(participant_json, '$.champLevel')::int as end_game_champ_level,
         json_extract(participant_json, '$.champExperience')::int as end_game_champ_experience,
 
@@ -47,10 +47,10 @@ renamed as (
         json_extract(participant_json, '$.firstTowerAssist')::boolean as first_tower_assist,
 
         -- lane & farm
-        replace(json_extract(participant_json, '$.teamPosition')::string, '"', '') as position_on_team,
-        replace(json_extract(participant_json, '$.individualPosition')::string, '"', '') as individual_position,
-        replace(json_extract(participant_json, '$.lane')::string, '"', '') as lane,
-        replace(json_extract(participant_json, '$.role')::string, '"', '') as role,
+        {{ extract_json_string('participant_json', '$.teamPosition') }} as position_on_team,   
+        {{ extract_json_string('participant_json', '$.individualPosition') }} as individual_position,   
+        {{ extract_json_string('participant_json', '$.lane') }} as lane,   
+        {{ extract_json_string('participant_json', '$.role') }} as role,   
         json_extract(participant_json, '$.participantId')::int as participant_id,
         json_extract(participant_json, '$.neutralMinionsKilled')::int as neutral_minions_killed,
         json_extract(participant_json, '$.totalAllyJungleMinionsKilled')::int as total_ally_jungle_minions_killed,
@@ -97,8 +97,8 @@ renamed as (
         json_extract(participant_json, '$.kills')::int as kills,
         json_extract(participant_json, '$.deaths')::int as deaths,
         json_extract(participant_json, '$.assists')::int as assists,
-        json_extract(participant_json, '$.challenges.kda') as kda,
-        round(json_extract(participant_json, '$.challenges.killParticipation')::float * 100, 2) as kill_participation,
+        json_extract(participant_json, '$.challenges.kda')::decimal as kda,
+        {{ extract_json_rate('participant_json', '$.challenges.killParticipation') }} as kill_participation,  
         json_extract(participant_json, '$.doubleKills')::int as double_kills,
         json_extract(participant_json, '$.tripleKills')::int as triple_kills,
         json_extract(participant_json, '$.quadraKills')::int as quadra_kills,
@@ -109,6 +109,7 @@ renamed as (
         json_extract(participant_json, '$.largestKillingSpree')::int as largest_killing_spree,
 
         -- objectives
+        -- missing: horde, riftHerald, atakhan
         json_extract(participant_json, '$.turretKills')::int as turret_kills,
         json_extract(participant_json, '$.inhibitorKills')::int as inhibitor_kills,
         json_extract(participant_json, '$.dragonKills')::int as dragon_kills,
@@ -148,11 +149,11 @@ renamed as (
         json_extract(participant_json, '$.largestCriticalStrike')::int as largest_critical_strike,
 
         -- timers
-        round(json_extract(participant_json, '$.totalTimeCCDealt')::int / 60, 2) as total_time_cc_dealt,
-        round(json_extract(participant_json, '$.totalTimeSpentDead')::int / 60, 2) as total_time_spent_dead,
-        round(json_extract(participant_json, '$.longestTimeSpentLiving')::int / 60, 2) as longest_time_spent_living,
-        round(json_extract(participant_json, '$.timeCCingOthers')::int / 60, 2) as time_ccing_others,
-        round(json_extract(participant_json, '$.timePlayed')::int / 60, 2) as time_played,
+        {{ extract_json_seconds_to_minutes('participant_json', '$.totalTimeCCDealt')}} as total_time_cc_dealt,
+        {{ extract_json_seconds_to_minutes('participant_json', '$.totalTimeSpentDead')}} as total_time_spent_dead,
+        {{ extract_json_seconds_to_minutes('participant_json', '$.longestTimeSpentLiving')}} as longest_time_spent_living,
+        {{ extract_json_seconds_to_minutes('participant_json', '$.timeCCingOthers')}} as time_ccing_others,
+        {{ extract_json_seconds_to_minutes('participant_json', '$.timePlayed')}} as time_played,
 
         -- game results
         json_extract(participant_json, '$.gameEndedInEarlySurrender')::boolean as game_ended_in_early_surrender,
