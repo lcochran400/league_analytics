@@ -5,4 +5,4 @@ sources:
     tables:
       - name: matches
       - name: participants
-      - name: objectives
+      - name: teams
