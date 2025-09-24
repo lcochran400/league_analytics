@@ -29,8 +29,7 @@ renamed as (
         {{ extract_json_string('match_json', '$.endOfGameResult') }} as end_of_match_result,
         {{ extract_json_string('match_json', '$.gameVersion') }} as patch_version,
         {{ extract_json_string('match_json', '$.platformId') }} as region_code,
-        {{ extract_json_string('match_json', '$.tournamentCode') }} as tournament_code,
-        match_json
+        {{ extract_json_string('match_json', '$.tournamentCode') }} as tournament_code
         
     from source
 
