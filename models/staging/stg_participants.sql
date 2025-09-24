@@ -56,7 +56,7 @@ renamed as (
         json_extract(participant_json, '$.consumablesPurchased')::int as consumables_purchased,
         json_extract(participant_json, '$.goldEarned')::int as gold_earned,
         json_extract(participant_json, '$.goldSpent')::int as gold_spent,
-        json_extract(participant_json, '$.challenges.goldPerMinute') as gold_per_minute,
+        json_extract(participant_json, '$.challenges.goldPerMinute')::decimal as gold_per_minute,
         json_extract(participant_json, '$.item0')::int as item0,
         json_extract(participant_json, '$.item1')::int as item1,
         json_extract(participant_json, '$.item2')::int as item2,
@@ -84,7 +84,7 @@ renamed as (
         json_extract(participant_json, '$.challenges.controlWardsPlaced') as control_wards_placed,
         json_extract(participant_json, '$.wardsKilled')::int as wards_killed,
         json_extract(participant_json, '$.visionScore')::int as vision_score,
-        json_extract(participant_json, '$.challenges.visionScorePerMinute') as vision_score_per_minute,
+        json_extract(participant_json, '$.challenges.visionScorePerMinute')::decimal as vision_score_per_minute,
 
         -- combat outcomes
         json_extract(participant_json, '$.kills')::int as kills,
