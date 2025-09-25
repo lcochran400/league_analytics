@@ -21,9 +21,22 @@ enriched as (
         first_tower_kill,
         cs_first_10_minutes,
         total_minions_killed + neutral_minions_killed as total_cs,
-        max_cs_advantage_vs_opponent,
-        gold_earned,
+        round(max_cs_advantage_vs_opponent, 0) as max_cs_advantage_vs_opponent,
         round(gold_per_minute, 2) as gold_per_minute,
+
+        (
+            all_in_pings + 
+            assist_me_pings + 
+            command_pings + 
+            enemy_missing_pings + 
+            enemy_vision_pings + 
+            hold_pings + 
+            get_back_pings + 
+            need_vision_pings + 
+            on_my_way_pings + 
+            push_pings 
+        ) as total_pings,
+
         wards_placed,
         control_wards_bought,
         control_wards_placed,
@@ -51,5 +64,3 @@ enriched as (
 )
 
 select * from enriched
-where riot_id_game_name = 'Grumby'
-and champion_name = 'Akali'
