@@ -2,7 +2,60 @@ sources:
   - name: league_raw
     database: league_data
     schema: main
+    description: Raw League of Legends match data extracted from Riot Games API
     tables:
       - name: matches
+        description: Core match metadata and game information from the Riot API match endpoint
+        columns:
+        - name: match_id
+          description: Unique identifier for each League of Legends match (e.g., NA1_4567890123)
+        - name: match_json
+          description: >
+            Complete match data JSON from the Riot API `info` key, containing game duration, 
+            patch version, queue type, and game creation timestamp. 
+            See [Match-v5 API docs](https://developer.riotgames.com/apis#match-v5/GET_getMatch) for full schema.
+          
       - name: participants
+        description: Individual player performance data for each participant in a match
+        columns:
+        - name: match_id
+          description: Foreign key linking to matches table - identifies which match this participant played in
+        - name: puuid
+          description: >
+            Riot's encrypted player universal unique identifier, used to track players 
+            across regions and games
+        - name: participant_json
+          description: >
+            Player performance JSON from the Riot API `info.participants` array, including KDA, 
+            CS, damage dealt/taken, items, and champion played. 
+            See [Match-v5 API docs](https://developer.riotgames.com/apis#match-v5/GET_getMatch) for complete participant schema.
+        - name: is_sub
+          description: >
+            Boolean flag indicating whether this participant is a substitute player 
+            (not part of the main team roster)
+          
       - name: teams
+        description: Team-level match results, compositions, and objective control data
+        columns:
+        - name: match_id
+          description: Foreign key linking to matches table - identifies which match this team data belongs to
+        - name: team_id
+          description: >
+            Riot's team identifier within the match (typically 100 for blue side, 200 for red side)
+        - name: is_my_team
+          description: >
+            Boolean flag identifying whether this team contains our tracked players 
+            (based on PUUID matching)
+        - name: team_json
+          description: >
+            Team performance JSON from the Riot API `info.teams` array, containing win/loss 
+            result and team statistics. 
+            See [Match-v5 API docs](https://developer.riotgames.com/apis#match-v5/GET_getMatch) for team object schema.
+        - name: bans_json
+          description: >
+            Champion ban data from the Riot API `info.teams.bans` array, showing which champions 
+            each team banned during draft phase
+        - name: objectives_json
+          description: >
+            Objective control data from the Riot API `info.teams.objectives` object, tracking 
+            dragons, barons, towers, inhibitors, and rift herald kills per team
