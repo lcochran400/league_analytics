@@ -13,7 +13,7 @@ matches as (
 teams as (
 
     select * from {{ ref('stg_teams')}}
-    where is_my_team = true
+    {# where is_my_team = true #}
 
 ),
 
@@ -23,6 +23,7 @@ joined as (
         matches.match_id,
         matches.patch_version,
         matches.match_duration_minutes,
+        teams.is_my_team,
         teams.team_id,
         teams.monster_slaying_feat_count,
         teams.warfare_feat_count,
@@ -58,6 +59,7 @@ enriched as (
         match_id,
         patch_version,
         match_duration_minutes,
+        is_my_team,
 
         case
             when team_id = 100
