@@ -50,7 +50,7 @@ renamed as (
         json_extract(participant_json, '$.totalEnemyJungleMinionsKilled')::int as total_enemy_jungle_minions_killed,
         json_extract(participant_json, '$.totalMinionsKilled')::int as total_minions_killed,
         json_extract(participant_json, '$.challenges.laneMinionsFirst10Minutes') as cs_first_10_minutes,
-        json_extract(participant_json, '$.challenges.maxCsAdvantageOnLaneOpponent') as max_cs_advantage_vs_opponent,
+        json_extract(participant_json, '$.challenges.maxCsAdvantageOnLaneOpponent')::decimal as max_cs_advantage_vs_opponent,
 
         -- economy
         json_extract(participant_json, '$.consumablesPurchased')::int as consumables_purchased,
