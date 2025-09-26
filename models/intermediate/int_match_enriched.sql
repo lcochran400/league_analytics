@@ -13,7 +13,6 @@ matches as (
 teams as (
 
     select * from {{ ref('stg_teams')}}
-    {# where is_my_team = true #}
 
 ),
 
