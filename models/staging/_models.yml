@@ -7,6 +7,9 @@ models:
     columns:
       - name: match_id
         description: Unique identifier for each League of Legends match
+        tests:
+          - not_null
+          - unique
       - name: queue_id
         description: >
           Riot's queue type identifier, indicating game mode 
@@ -39,7 +42,7 @@ models:
         description: Riot platform/region identifier (e.g., 'NA1', 'EUW1', 'KR')
       - name: tournament_code
         description: Tournament identifier if match was part of organized tournament, null for regular matches
-        
+
   - name: stg_participants
     description: >
       Staging model that extracts individual player performance data from raw Riot API participant 
@@ -48,6 +51,9 @@ models:
     columns:
       - name: match_participant_sk
         description: Surrogate key combining match_id and puuid for unique player-match identification
+        tests:
+          - unique
+          - not_null
       - name: match_id
         description: Foreign key linking to matches - identifies which match this player participated in
       - name: puuid
@@ -297,6 +303,9 @@ models:
     columns:
       - name: match_team_sk
         description: Surrogate key combining match_id and team_id for unique team-match identification
+        tests:
+          - unique
+          - not_null
       - name: match_id
         description: Foreign key linking to matches - identifies which match this team participated in
       - name: team_id
