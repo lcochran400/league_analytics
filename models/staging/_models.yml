@@ -39,6 +39,7 @@ models:
         description: Riot platform/region identifier (e.g., 'NA1', 'EUW1', 'KR')
       - name: tournament_code
         description: Tournament identifier if match was part of organized tournament, null for regular matches
+        
   - name: stg_participants
     description: >
       Staging model that extracts individual player performance data from raw Riot API participant 
@@ -287,6 +288,7 @@ models:
         description: Boolean indicating if this player's team surrendered early (before 15 minutes)
       - name: win
         description: Boolean indicating if this player's team won the match
+
   - name: stg_teams
     description: >
       Staging model that extracts team-level match results and objective control data from raw
