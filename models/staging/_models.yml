@@ -1,11 +1,343 @@
 models:
-  - name: stg_participants
+  - name: stg_matches
+    description: >
+      Staging model that extracts and transforms core match metadata from raw Riot API JSON responses.
+      Converts unix timestamps to UTC, standardizes game identifiers, and provides clean match-level
+      dimensions for downstream analysis. One row per match with essential game context.
     columns:
-      - name: individual_position
-        description: '{{ doc("position") }}'
+      - name: match_id
+        description: Unique identifier for each League of Legends match
+      - name: queue_id
+        description: >
+          Riot's queue type identifier, indicating game mode 
+          (e.g., 420 for Ranked Solo/Duo, 440 for Ranked Flex)
+      - name: map_id
+        description: Map identifier (11 for Summoner's Rift)
+      - name: game_id
+        description: >
+          Internal Riot game ID, different from match_id and used for 
+          internal game tracking
+      - name: match_created_at
+        description: UTC timestamp when the match was created in the system
+      - name: match_started_at
+        description: UTC timestamp when the match  began
+      - name: match_ended_at
+        description: UTC timestamp when the match concluded
+      - name: match_duration_minutes
+        description: Match length in minutes
+      - name: game_mode
+        description: Game mode string (e.g., 'CLASSIC', 'ARAM', 'URF')
+      - name: match_type_name
+        description: Human-readable match type (e.g., 'teambuilder-match-4.23')
+      - name: game_type
+        description: Game type classification (e.g., 'MATCHED_GAME', 'CUSTOM_GAME')
+      - name: end_of_match_result
+        description: Match conclusion status (e.g., 'GameComplete', 'Surrender')
+      - name: patch_version
+        description: League of Legends patch version when match was played (e.g., '13.24.519.2124')
+      - name: region_code
+        description: Riot platform/region identifier (e.g., 'NA1', 'EUW1', 'KR')
+      - name: tournament_code
+        description: Tournament identifier if match was part of organized tournament, null for regular matches
+  - name: stg_participants
+    description: >
+      Staging model that extracts individual player performance data from raw Riot API participant 
+      responses. Transforms player statistics, champion performance, economy, vision, and combat metrics.
+      One row per tracked team player per match (5 rows per match - enemy participants filtered out).
+    columns:
+      - name: match_participant_sk
+        description: Surrogate key combining match_id and puuid for unique player-match identification
+      - name: match_id
+        description: Foreign key linking to matches - identifies which match this player participated in
+      - name: puuid
+        description: Riot's encrypted player universal unique identifier
+      - name: team_id
+        description: Team identifier for this player (100 for blue side, 200 for red side)
+      - name: riot_id_game_name
+        description: Player's Riot ID display name (visible in-game username)
+      - name: riot_id_tagline
+        description: Player's Riot ID tagline (the part after the '#' symbol)
+      - name: summoner_level
+        description: Player's account level at the time of the match
+      - name: champion_name
+        description: Name of the champion played by this player in the match
+      - name: end_game_champ_level
+        description: Champion level achieved by the end of the match (1-18)
+      - name: end_game_champ_experience
+        description: Total champion experience earned by the end of the match
+      - name: primary_summoner_spell
+        description: Riot's ID for the player's primary summoner spell
+      - name: secondary_summoner_spell
+        description: Riot's ID for the player's secondary summoner spell
+      - name: primary_summoner_spell_casts
+        description: Number of times the primary summoner spell was used during the match
+      - name: secondary_summoner_spell_casts
+        description: Number of times the secondary summoner spell was used during the match
+      - name: q_spell_casts
+        description: Number of times the Q ability was cast during the match
+      - name: w_spell_casts
+        description: Number of times the W ability was cast during the match
+      - name: e_spell_casts
+        description: Number of times the E ability was cast during the match
+      - name: r_spell_casts
+        description: Number of times the R ultimate ability was cast during the match
+      - name: first_blood_kill
+        description: Boolean indicating if this player achieved the first blood kill of the match
+      - name: first_tower_kill
+        description: Boolean indicating if this player destroyed the first tower of the match
+      - name: first_blood_assist
+        description: Boolean indicating if this player assisted in the first blood kill
+      - name: first_tower_assist
+        description: Boolean indicating if this player assisted in destroying the first tower
       - name: position_on_team
         description: '{{ doc("position") }}'
-      - name: role
-        description: '{{ doc("role") }}'
+      - name: individual_position
+        description: '{{ doc("position") }}'
       - name: lane
         description: '{{ doc("lane") }}'
+      - name: role
+        description: '{{ doc("role") }}'
+      - name: participant_id
+        description: Riot's internal participant ID within the match (1-10)
+      - name: neutral_minions_killed
+        description: Number of neutral jungle monsters killed by this player
+      - name: total_ally_jungle_minions_killed
+        description: Number of allied jungle monsters killed by this player
+      - name: total_enemy_jungle_minions_killed
+        description: Number of enemy jungle monsters killed by this player
+      - name: total_minions_killed
+        description: >
+          Total number of minions killed by this player (must be combined with `total_enemy_jungle_minions_killed` to 
+          reveal CS score)
+      - name: cs_first_10_minutes
+        description: Creep score (minions killed) achieved in the first 10 minutes of the match
+      - name: max_cs_advantage_vs_opponent
+        description: Largest CS lead this player achieved over their lane opponent
+      - name: consumables_purchased
+        description: Number of consumable items (potions, wards, etc.) purchased during the match
+      - name: gold_earned
+        description: Total gold earned by this player during the match
+      - name: gold_spent
+        description: Total gold spent by this player during the match
+      - name: gold_per_minute
+        description: Average gold earned per minute by this player
+      - name: item0
+        description: Riot's item ID for the first item slot
+      - name: item1
+        description: Riot's item ID for the second item slot
+      - name: item2
+        description: Riot's item ID for the third item slot
+      - name: item3
+        description: Riot's item ID for the fourth item slot
+      - name: item4
+        description: Riot's item ID for the fifth item slot
+      - name: item5
+        description: Riot's item ID for the sixth item slot
+      - name: item6
+        description: Riot's item ID for the seventh item slot
+      - name: items_purchased
+        description: Total number of items purchased during the match
+      - name: all_in_pings
+        description: Number of "all-in" communication pings used by this player
+      - name: assist_me_pings
+        description: Number of "assist me" communication pings used by this player
+      - name: command_pings
+        description: Number of command communication pings used by this player
+      - name: enemy_missing_pings
+        description: Number of "enemy missing" communication pings used by this player
+      - name: enemy_vision_pings
+        description: Number of enemy vision communication pings used by this player
+      - name: hold_pings
+        description: Number of "hold position" communication pings used by this player (deprecated ping)
+      - name: get_back_pings
+        description: Number of "get back" communication pings used by this player
+      - name: need_vision_pings
+        description: Number of "need vision" communication pings used by this player
+      - name: on_my_way_pings
+        description: Number of "on my way" communication pings used by this player
+      - name: push_pings
+        description: Number of "push" communication pings used by this player
+      - name: wards_placed
+        description: Total number of wards placed by this player during the match
+      - name: control_wards_bought
+        description: Number of control wards (pink wards) purchased during the match
+      - name: control_wards_placed
+        description: Number of control wards placed by this player during the match
+      - name: wards_killed
+        description: Number of enemy wards destroyed by this player
+      - name: vision_score
+        description: >
+          Riot's vision score metric combining ward placement, enemy ward destruction, 
+          and vision denial
+      - name: vision_score_per_minute
+        description: Average vision score earned per minute by this player
+      - name: kills
+        description: Number of enemy champions killed by this player
+      - name: deaths
+        description: Number of times this player was killed by enemies
+      - name: assists
+        description: Number of times this player assisted in killing an enemy champion
+      - name: kda
+        description: Kill/Death/Assist ratio calculated as (kills + assists) / deaths
+      - name: kill_participation
+        description: >
+          Percentage of team's total kills that this player was involved in 
+          (either kill or assist)
+      - name: double_kills
+        description: Number of double kills (2 kills within a short time) achieved by this player
+      - name: triple_kills
+        description: Number of triple kills (3 kills within a short time) achieved by this player
+      - name: quadra_kills
+        description: Number of quadra kills (4 kills within a short time) achieved by this player
+      - name: penta_kills
+        description: Number of penta kills (5 kills within a short time) achieved by this player
+      - name: unreal_kills
+        description: Number of unreal kills (6+ kills within a short time) achieved by this player
+      - name: killing_sprees
+        description: Number of killing sprees (multiple kills without dying) achieved by this player
+      - name: largest_multi_kill
+        description: Highest number of champions killed in a single multi-kill by this player
+      - name: largest_killing_spree
+        description: Longest killing spree (kills without dying) achieved by this player
+      - name: turret_kills
+        description: Number of enemy turrets this player directly destroyed
+      - name: inhibitor_kills
+        description: Number of enemy inhibitors this player directly destroyed
+      - name: dragon_kills
+        description: Number of dragons this player directly killed
+      - name: baron_kills
+        description: Number of barons this player directly killed
+      - name: nexus_kills
+        description: Number of enemy nexus structures this player directly destroyed
+      - name: turret_takedowns
+        description: Number of enemy turrets this player was involved in destroying (kills + assists)
+      - name: inhibitor_takedowns
+        description: Number of enemy inhibitors this player was involved in destroying (kills + assists)
+      - name: nexus_takedowns
+        description: Number of enemy nexus structures this player was involved in destroying
+      - name: turrets_lost
+        description: Number of allied turrets lost while this player was alive
+      - name: inhibitors_lost
+        description: Number of allied inhibitors lost while this player was alive
+      - name: nexus_lost
+        description: Number of allied nexus structures lost while this player was alive
+      - name: objectives_stolen
+        description: Number of enemy objectives (dragon, baron, etc.) stolen by this player
+      - name: objectives_stolen_assists
+        description: Number of enemy objectives this player assisted teammates in stealing
+      - name: total_damage_dealt_to_champions
+        description: Total damage dealt to enemy champions by this player
+      - name: total_damage_dealt_to_buildings
+        description: Total damage dealt to enemy buildings (turrets, inhibitors) by this player
+      - name: total_damage_dealt_to_objectives
+        description: Total damage dealt to neutral objectives (dragon, baron, etc.) by this player
+      - name: total_damage_dealt_to_turrets
+        description: Total damage dealt specifically to enemy turrets by this player
+      - name: total_damage_self_mitigated
+        description: Total damage prevented through shields, resistances, and other mitigation
+      - name: total_physical_damage_dealt
+        description: Total physical damage dealt by this player to all targets
+      - name: total_physical_damage_dealt_to_champions
+        description: Total physical damage dealt specifically to enemy champions
+      - name: total_physical_damage_taken
+        description: Total physical damage received by this player from all sources
+      - name: total_magic_damage_dealt
+        description: Total magic damage dealt by this player to all targets
+      - name: total_magic_damage_dealt_to_champions
+        description: Total magic damage dealt specifically to enemy champions
+      - name: total_magic_damage_taken
+        description: Total magic damage received by this player from all sources
+      - name: total_true_damage_dealt
+        description: Total true damage dealt by this player to all targets
+      - name: total_true_damage_dealt_to_champions
+        description: Total true damage dealt specifically to enemy champions
+      - name: total_true_damage_taken
+        description: Total true damage received by this player from all sources
+      - name: total_damage_shielded_on_teammates
+        description: Total damage prevented on teammates through shields provided by this player
+      - name: total_heals_on_teammates
+        description: Total health restored to teammates by this player's healing abilities
+      - name: total_units_healed
+        description: Total number of units (champions, minions, etc.) healed by this player
+      - name: total_heal
+        description: Total health restored by this player (including self-healing)
+      - name: total_damage_dealt
+        description: Total damage dealt by this player to all targets and damage types combined
+      - name: total_damage_taken
+        description: Total damage received by this player from all sources and damage types
+      - name: highest_champion_damage
+        description: Highest single instance of damage dealt to an enemy champion
+      - name: largest_critical_strike
+        description: Highest critical strike damage dealt by this player in a single hit
+      - name: total_time_cc_dealt
+        description: Total time in minutes this player crowd controlled enemy champions
+      - name: total_time_spent_dead
+        description: Total time in minutes this player spent dead during the match
+      - name: longest_time_spent_living
+        description: Longest consecutive time in minutes this player stayed alive
+      - name: time_ccing_others
+        description: Total time in minutes this player spent crowd controlling enemies
+      - name: time_played
+        description: Total time in minutes this player was active in the match
+      - name: game_ended_in_early_surrender
+        description: Boolean indicating if the match ended in an early surrender (before 15 minutes)
+      - name: game_ended_in_surrender
+        description: Boolean indicating if the match ended in a surrender by either team
+      - name: team_early_surrendered
+        description: Boolean indicating if this player's team surrendered early (before 15 minutes)
+      - name: win
+        description: Boolean indicating if this player's team won the match
+  - name: stg_teams
+    description: >
+      Staging model that extracts team-level match results and objective control data from raw
+      Riot API responses. Transforms team performance metrics, win/loss outcomes, and detailed
+      objective tracking. One row per team per match (2 rows per match).
+    columns:
+      - name: match_team_sk
+        description: Surrogate key combining match_id and team_id for unique team-match identification
+      - name: match_id
+        description: Foreign key linking to matches - identifies which match this team participated in
+      - name: team_id
+        description: Riot's team identifier within the match (100 for blue side, 200 for red side)
+      - name: is_my_team
+        description: Boolean flag identifying whether this team contains our tracked players
+      - name: win
+        description: Boolean indicating whether this team won the match (true = victory, false = defeat)
+      - name: monster_slaying_feat_count
+        description: Count of epic monster slaying feats achieved by this team during the match (value of 1001 means feat was lost)
+      - name: warfare_feat_count
+        description: Count of initial kills achieved by this team (value of 1001 means feat was lost)
+      - name: first_turret_feat_count
+        description: Count related to first turret destruction feat for this team (value of 1001 means feat was lost) 
+      - name: has_slain_first_champion
+        description: Boolean indicating if this team achieved the first champion kill of the match
+      - name: has_slain_first_tower
+        description: Boolean indicating if this team destroyed the first tower of the match
+      - name: has_slain_first_inhibitor
+        description: Boolean indicating if this team destroyed the first inhibitor of the match
+      - name: has_slain_first_dragon
+        description: Boolean indicating if this team killed the first dragon of the match
+      - name: has_slain_first_grub
+        description: Boolean indicating if this team killed the first void grub of the match
+      - name: has_slain_first_rift_herald
+        description: Boolean indicating if this team killed the first rift herald of the match
+      - name: has_slain_first_atakhan
+        description: Boolean indicating if this team killed the first atakhan of the match
+      - name: has_slain_first_baron
+        description: Boolean indicating if this team killed the first baron of the match
+      - name: total_champion_kills
+        description: Total number of enemy champions killed by this team during the match
+      - name: total_tower_kills
+        description: Total number of enemy towers destroyed by this team during the match
+      - name: total_inhibitor_kills
+        description: Total number of enemy inhibitors destroyed by this team during the match
+      - name: total_dragon_kills
+        description: Total number of dragons killed by this team during the match
+      - name: total_grub_kills
+        description: Total number of void grubs killed by this team during the match
+      - name: total_rift_herald_kills
+        description: Total number of rift heralds killed by this team during the match
+      - name: total_atakhan_kills
+        description: Total number of atakhans killed by this team during the match
+      - name: total_baron_kills
+        description: Total number of barons killed by this team during the match
